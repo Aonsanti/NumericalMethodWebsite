@@ -1,138 +1,201 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from "react";
+import axios from "axios";
+import "./History.css";
 
 export default function History() {
-    const [data, setData] = useState({
-        bisection: [],
-        false_position: [],
-        graphical: [],
-        newton_raphson: [],
-        one_point: [],
-        secant: [],
-    });
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const [bisection, setBisection] = useState([]);
+  const [graphical, setGraphical] = useState([]);
+  const [falseposition, setFalseposition] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const endpoints = [
-                    'bisection',
-                    'false_position',
-                    'graphical',
-                    'newton_raphson',
-                    'one_point',
-                    'secant',
-                ];
-
-                const fetchPromises = endpoints.map(endpoint =>
-                    fetch(`${import.meta.env.VITE_API_URL}/${endpoint}`).then(res => {
-                        if (!res.ok) throw new Error(`Failed to fetch ${endpoint}`);
-                        return res.json();
-                    })
-                );
-
-                const results = await Promise.all(fetchPromises);
-
-                const newData = {};
-                endpoints.forEach((endpoint, index) => {
-                    newData[endpoint] = Array.isArray(results[index]) ? results[index] : [];
-                });
-
-                setData(prevData => ({ ...prevData, ...newData }));
-
-                setLoading(false);
-            } catch (err) {
-                console.error('Fetch error:', err);
-                setError(err.message);
-                setLoading(false);
-            }
-        };
-
-        fetchData();
-    }, []);
-
-    if (loading) {
-        return <div>กำลังโหลด...</div>;
-    }
-
-    if (error) {
-        return <div>เกิดข้อผิดพลาด: {error}</div>;
-    }
-
-    // ฟังก์ชันแปลงวันที่
-    const formatDate = (dateString) => {
-        if (!dateString) return 'N/A';
-        const date = new Date(dateString);
-        return date.toLocaleString('th-TH', {
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
-        }).replace(/,/, ''); 
+  useEffect(() => {
+    const fetchAll = async () => {
+      try {
+        setLoading(true);
+        const [bisectionRes , graphicalRes , falsepositionRes] = await Promise.all([
+          axios.get("http://localhost:8080/bisection"),
+          axios.get("http://localhost:8080/graphical"),
+          axios.get("http://localhost:8080/falseposition")
+        ]);
+        setBisection(bisectionRes.data);
+        setGraphical(graphicalRes.data);
+        setFalseposition(falsepositionRes.data);
+      } catch (err) {
+        console.error(err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
     };
+    fetchAll();
+  }, []);
 
-    return (
-        <div>
-            <h1>ประวัติการคำนวณ</h1>
-            {Object.entries(data).map(([tableName, tableData]) => (
-                <div key={tableName} style={{ marginBottom: '40px' }}>
-                    <h2>{tableName.charAt(0).toUpperCase() + tableName.slice(1).replace('_', ' ')}</h2>
-                    {tableData.length === 0 ? (<div>ไม่มีข้อมูลใน {tableName}</div>) : (
-                        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '20px' }}>
-                            <thead>
-                                <tr style={{ backgroundColor: '#f2f2f2' }}>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>ID</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>สมการ</th>
-                                    {['bisection', 'false_position', 'graphical'].includes(tableName) && (
-                                        <>
-                                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Lower Bound</th>
-                                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>Upper Bound</th>
-                                        </>
-                                    )}
-                                    {['newton_raphson', 'one_point'].includes(tableName) && (
-                                        <th style={{ border: '1px solid #ddd', padding: '8px' }}>Initial Value</th>
-                                    )}
-                                    {tableName === 'secant' && (
-                                        <>
-                                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>X0</th>
-                                            <th style={{ border: '1px solid #ddd', padding: '8px' }}>X1</th>
-                                        </>
-                                    )}
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>ผลลัพธ์</th>
-                                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>วันที่สร้าง</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {tableData.map((item) => (
-                                    <tr key={item.id} style={{ border: '1px solid #ddd' }}>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.id}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.function_text || 'N/A'}</td>
-                                        {['bisection', 'false_position', 'graphical'].includes(tableName) && (
-                                            <>
-                                                <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.lower_bound || 'N/A'}</td>
-                                                <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.upper_bound || 'N/A'}</td>
-                                            </>
-                                        )}
-                                        {['newton_raphson', 'one_point'].includes(tableName) && (
-                                            <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.initial_value || 'N/A'}</td>
-                                        )}
-                                        {tableName === 'secant' && (
-                                            <>
-                                                <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.x0 || 'N/A'}</td>
-                                                <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.x1 || 'N/A'}</td>
-                                            </>
-                                        )}
-                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{item.result || 'N/A'}</td>
-                                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{formatDate(item.created_at)}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    )}
-                </div>
-            ))}
-        </div>
-    );
+  if (loading) return <div>Loading</div>;
+  if (error) return <div>Error: {error}</div>;
+
+  return (
+    <div className="ShowHistory">
+      {/* ======= item 1 ======= */}
+      <div className="item">
+        <h1>Bisection</h1>
+        <table className="HistoryTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Function f(x)</th>
+              <th>Lower bound (xL)</th>
+              <th>Upper bound (xR)</th>
+              <th>Tolerance (Error)</th>
+              <th>Date Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            {bisection.length === 0 ? (
+              <tr>
+                <td colSpan="6" style={{ textAlign: "center" }}>
+                  Data is Empty
+                </td>
+              </tr>
+            ) : (
+              bisection.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.id}</td>
+                  <td>{item.fx}</td>
+                  <td>{item.xl}</td>
+                  <td>{item.xr}</td>
+                  <td>{item.tolerance}</td>
+                  <td>
+                    {item.datecreate
+                      ? new Date(item.datecreate)
+                          .toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                            hour12: false,
+                          })
+                          .replace(/,/, " ")
+                      : "N/A"}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+
+
+      {/* ======= item 2 ======= */}
+      <div className="item">
+        <h1>Graphical</h1>
+        <table className="HistoryTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Function f(x)</th>
+              <th>xStart(xL)</th>
+              <th>xEnd (xR)</th>
+              <th>Date Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            {graphical.length === 0 ? (
+              <tr>
+                <td colSpan="6" style={{ textAlign: "center" }}>
+                  No data available
+                </td>
+              </tr>
+            ) : (
+              graphical.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.id}</td>
+                  <td>{item.fx}</td>
+                  <td>{item.xstart}</td>
+                  <td>{item.xend}</td>
+                  <td>
+                    {item.datecreate
+                      ? new Date(item.datecreate)
+                          .toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                            hour12: false,
+                          })
+                          .replace(/,/, " ")
+                      : "N/A"}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+
+      {/* ======= item 3 ======= */}
+      <div className="item">
+        <h1>FalsePosition</h1>
+        <table className="HistoryTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Function f(x)</th>
+              <th>Lower bound (xL)</th>
+              <th>Upper bound (xR)</th>
+              <th>Tolerance (Error)</th>
+              <th>Date Created</th>
+            </tr>
+          </thead>
+          <tbody>
+            {falseposition.length === 0 ? (
+              <tr>
+                <td colSpan="6" style={{ textAlign: "center" }}>
+                  Data is Empty
+                </td>
+              </tr>
+            ) : (
+              falseposition.map((item) => (
+                <tr key={item.id}>
+                  <td>{item.id}</td>
+                  <td>{item.fx}</td>
+                  <td>{item.xl}</td>
+                  <td>{item.xr}</td>
+                  <td>{item.tolerance}</td>
+                  <td>
+                    {item.datecreate
+                      ? new Date(item.datecreate)
+                          .toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                            second: "2-digit",
+                            hour12: false,
+                          })
+                          .replace(/,/, " ")
+                      : "N/A"}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+
+
+
+
+
+
+    </div>
+  );
 }

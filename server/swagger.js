@@ -5,7 +5,7 @@ const doc = {
     title: 'Nodejs + MySQL API',
     description: 'Nodejs + MySQL API',
   },
-  host: 'localhost:5173',
+  host: 'localhost:8080',
   schemes: ['http'],
 };
 

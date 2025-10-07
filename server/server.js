@@ -1,109 +1,112 @@
-const express = require('express');
-const mysql = require('mysql2');
-const cors = require('cors')
+const express = require("express");
+const mysql = require("mysql2");
+const cors = require("cors");
 
-const app = express()
-app.use(cors())
+const app = express();
+app.use(cors());
 app.use(express.json());
 
-
 const db = mysql.createConnection({
-    host: process.env.DB_HOST || 'localhost',
-    user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || 'root',
-    database: process.env.DB_NAME || 'numericalmethod',
-    port: process.env.DB_PORT || 3306
-});
-
-const connectWithRetry = (retries = 10, delay = 5000) => {
-    db.connect((err) => {
-        if (err) {
-            console.error('Database connection failed:', err);
-            if (retries > 0) {
-                console.log(`Retrying connection (${retries} attempts left)...`);
-                setTimeout(() => connectWithRetry(retries - 1, delay), delay);
-            } else {
-                console.error('Max retry attempts reached. Could not connect to database.');
-            }
-        } else {
-            console.log('Connected to MySQL database');
-        }
-    });
-};
-
-connectWithRetry();
-
-app.get('/',(req , res) => {
-    return res.json("This is from backend")
-});
-
-app.get('/bisection' , (req , res)=>{
-    const sql = "SELECT * FROM bisection";
-    db.query(sql,(err , data) =>{
-        console.log(err, data);
-        if(err) return res.json(err);
-        return res.json(data);
-    })
+    host: process.env.DB_HOST || "db",
+    user: process.env.DB_USER || "root",
+    password: process.env.DB_PASSWORD || "root",
+    database: process.env.DB_NAME || "numericalmethod",
+    port: process.env.DB_PORT || "3306",
 })
 
-app.post('/bisection', (req, res) => {
-    const { function_text, lower_bound, upper_bound, result } = req.body;
-    const sql = "INSERT INTO bisection (function_text, lower_bound, upper_bound, result, created_at) VALUES (?, ?, ?, ?, NOW())";
-    db.query(sql, [function_text, lower_bound, upper_bound, result], (err, result) => {
-        if (err) {
-            console.error("Error inserting data:", err);
+app.get("/graphical" , (req , res) =>{
+    db.query("SELECT * FROM graphical" , (err , data)=>{
+        if(err){
+            console.error("❌ Graphical Query error:", err.message);
             return res.status(500).json({ error: err.message });
         }
-        return res.status(201).json({ message: "Data inserted successfully", id: result.insertId });
-    });
-});
-
-app.get('/false_position' , (req , res)=>{
-    const sql = "SELECT * FROM false_position";
-    db.query(sql,(err , data) =>{
-        if(err) return res.json(err);
+        console.log("✅ Fetch Graphical:", data.length, "rows");
         return res.json(data);
     })
 })
 
-app.get('/graphical' , (req , res)=>{
-    const sql = "SELECT * FROM graphical";
-    db.query(sql,(err , data) =>{
-        if(err) return res.json(err);
+app.get("/bisection" , (req , res) =>{
+    db.query("SELECT * FROM bisection" , (err , data)=>{
+        if(err){
+            console.error("❌ Bisection Query error:", err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        console.log("✅ Fetech Bisection:", data.length, "rows");
         return res.json(data);
     })
 })
 
 
-app.get('/newton_raphson' , (req , res)=>{
-    const sql = "SELECT * FROM newton_raphson";
-    db.query(sql,(err , data) =>{
-        if(err) return res.json(err);
+app.get("/falseposition" , (req , res) =>{
+    db.query("SELECT * FROM falseposition" , (err , data)=>{
+        if(err){
+            console.error("❌ False-Position Query error:", err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        console.log("✅ Fetch False-Position:", data.length, "rows");
         return res.json(data);
     })
 })
 
-app.get('/one_point' , (req , res)=>{
-    const sql = "SELECT * FROM one_point";
-    db.query(sql,(err , data) =>{
-        if(err) return res.json(err);
-        return res.json(data);
+
+app.post('/graphical' , (req , res) =>{
+    const sql = "INSERT INTO graphical (`fx` ,`xstart`,`xend`) VALUES (?)";
+    const values =[
+        req.body.fx,
+        req.body.xstart,
+        req.body.xend,
+    ]
+    db.query(sql,[values] , (err , data) =>{
+        if(err) {
+            console.error("❌ Insert error:", err.message);
+            return res.status(500).json({ error: err.message }); 
+        }
+        console.log("✅ Graphical inserted successfully"); 
+        return res.json({ message: "Graphical Insert to Database Success" });
     })
 })
 
-app.get('/secant' , (req , res)=>{
-    const sql = "SELECT * FROM secant";
-    db.query(sql,(err , data) =>{
-        if(err) return res.json(err);
-        return res.json(data);
+app.post('/bisection' , (req , res) =>{
+    const sql = "INSERT INTO bisection (`fx` ,`xl`,`xr`,`tolerance`) VALUES (?)";
+    const values =[
+        req.body.fx,
+        req.body.xl,
+        req.body.xr,
+        req.body.tolerance
+    ]
+    db.query(sql,[values] , (err , data) =>{
+        if(err) {
+            console.error("❌ Insert error:", err.message);
+            return res.status(500).json({ error: err.message }); 
+        }
+        console.log("✅ Bisection inserted successfully"); 
+        return res.json({ message: "Bisection Insert to Database Success" });
     })
 })
+
+app.post('/falseposition' , (req , res) =>{
+    const sql = "INSERT INTO falseposition (`fx` ,`xl`,`xr`,`tolerance`) VALUES (?)";
+    const values =[
+        req.body.fx,
+        req.body.xl,
+        req.body.xr,
+        req.body.tolerance
+    ]
+    db.query(sql,[values] , (err , data) =>{
+        if(err) {
+            console.error("❌ False-Position Insert error:", err.message);
+            return res.status(500).json({ error: err.message }); 
+        }
+        console.log("✅ False-Position inserted successfully"); 
+        return res.json({ message: "False-Position Insert to Database Success" });
+    })
+})
+
 
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger-output.json');
-
-app.use('/api-docs' , swaggerUi.serve , swaggerUi.setup(swaggerDocument));
+app.use('/api-docs', swaggerUi.serve , swaggerUi.setup(swaggerDocument));
 
 app.listen(8080 , () => {
-    console.log("Server started on port 8080");
-});
+    console.log("Connected to Backend");
+})

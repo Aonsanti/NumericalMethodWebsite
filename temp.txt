@@ -1,79 +1,23 @@
-version: '3.8'
-services:
-  client:
-    build: ./client
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./client:/app
-      - /app/node_modules
-    depends_on:
-      - server
-    environment:
-      - VITE_API_URL=http://localhost:8080 
-
-  server:
-    build: ./server
-    ports:
-      - "8080:8080"
-    volumes:
-      - ./server:/app
-      - /app/node_modules
-    depends_on:
-      - db
-    environment:
-      - NODE_ENV=development
-      - DB_HOST=db
-      - DB_USER=root
-      - DB_PASSWORD=
-      - DB_NAME=numericalmethod
-      - DB_PORT=3306
-
-  db:
-    image: mysql:8.0
-    ports:
-      - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD:
-      MYSQL_DATABASE: numericalmethod
-    volumes:
-      - db-data:/var/lib/mysql
-
-volumes:
-  db-data:
-
-
-server
-FROM node:20
-
-WORKDIR /app
-
-COPY package*.json ./
-
-RUN npm install
-
-COPY . .
-
-EXPOSE 8080
-
-CMD ["node", "server.js"]
-
-
-
-
-client
-FROM node:20
-
-WORKDIR /app
-
-COPY package*.json ./
-
-RUN npm install
-
-COPY . .
-
-EXPOSE 5173
-
-CMD ["npm", "run", "dev"]
-
-
+ useEffect(() => {
+    const fetchBisection = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const res = await axios.get("http://localhost:8080/bisection");
+        
+        if (Array.isArray(res.data)) {
+          setBisection(res.data);
+        } else {
+          console.error("Response is not an array:", res.data);
+          setBisection([]);
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
+        setError(err.message);
+        setBisection([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBisection();
+  }, []);

@@ -3,14 +3,14 @@ import { useNavigate } from "react-router-dom";
 import "./Header.css";
 
 const Charpter_Content = {
-  "Root of Equation": ["Bisection", "Graph", "False Position"],
+  "Root of Equation": ["Bisection", "Graphical", "False Position"],
   "Linear Algebra": ["Gaussian Elimination", "LU Decomposition", "Matrix Inverse"]
 };
 
 const pathMap = {
   "History": "/history",
   "Bisection": "/bisection",
-  "Graph": "/graph",
+  "Graphical": "/graphical",
   "False Position": "/false-position",
   "Gaussian Elimination": "/gaussian-elimination",
   "LU Decomposition": "/lu-decomposition",

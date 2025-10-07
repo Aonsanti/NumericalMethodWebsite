@@ -5,28 +5,21 @@
     "description": "Nodejs + MySQL API",
     "version": "1.0.0"
   },
-  "host": "localhost:5173",
+  "host": "localhost:8080",
   "basePath": "/",
   "schemes": [
     "http"
   ],
   "paths": {
-    "/": {
+    "/graphical": {
       "get": {
         "description": "",
         "responses": {
           "200": {
             "description": "OK"
-          }
-        }
-      }
-    },
-    "/bisection": {
-      "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       },
@@ -39,16 +32,13 @@
             "schema": {
               "type": "object",
               "properties": {
-                "function_text": {
+                "fx": {
                   "example": "any"
                 },
-                "lower_bound": {
+                "xstart": {
                   "example": "any"
                 },
-                "upper_bound": {
-                  "example": "any"
-                },
-                "result": {
+                "xend": {
                   "example": "any"
                 }
               }
@@ -56,8 +46,8 @@
           }
         ],
         "responses": {
-          "201": {
-            "description": "Created"
+          "200": {
+            "description": "OK"
           },
           "500": {
             "description": "Internal Server Error"
@@ -65,52 +55,96 @@
         }
       }
     },
-    "/false_position": {
+    "/bisection": {
       "get": {
         "description": "",
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "fx": {
+                  "example": "any"
+                },
+                "xl": {
+                  "example": "any"
+                },
+                "xr": {
+                  "example": "any"
+                },
+                "tolerance": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }
     },
-    "/graphical": {
+    "/falseposition": {
       "get": {
         "description": "",
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
-      }
-    },
-    "/newton_raphson": {
-      "get": {
+      },
+      "post": {
         "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "fx": {
+                  "example": "any"
+                },
+                "xl": {
+                  "example": "any"
+                },
+                "xr": {
+                  "example": "any"
+                },
+                "tolerance": {
+                  "example": "any"
+                }
+              }
+            }
           }
-        }
-      }
-    },
-    "/one_point": {
-      "get": {
-        "description": "",
+        ],
         "responses": {
           "200": {
             "description": "OK"
-          }
-        }
-      }
-    },
-    "/secant": {
-      "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
           }
         }
       }

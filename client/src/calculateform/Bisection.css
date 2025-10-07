@@ -40,12 +40,74 @@ input:focus{
     border-radius: 5px;
     padding: 10px;
     margin-top: 20px;
-    max-width:250px;
+    min-width:250px;
     transition: all 0.3s;
     cursor: pointer;
 }
 .confirm:hover{
     border: 2px solid white;
     background-color: rgb(3, 142, 3);
+    transform: scale(1.05);
+}
+.table-container{
+    display: flex;
+    justify-content: center;
+}
+.table-container table {
+    margin: auto; 
+    border-collapse: collapse;
+    width: 40%;  
+    text-align: center;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px 20px;
+    border-bottom: 1px solid rgb(83, 82, 82);
+    transition: 0.3s;
+    cursor:default;
+}
+td{
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+th {
+    background-color: #122844;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+}
+th:hover , td:hover{
+    transform: scale(1.05);
+    background-color: white;
+    color: black;
+}
+
+.graph-container {
+    margin: 40px auto;
+    padding: 20px;
+    min-width: 800px;
+    max-height: 400px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 1);
+    transition: 0.5s;
+}
+.graph-container:hover{
+    transform: scale(1.05);
+}
+.saveproblem{
+    margin-left: 30px;
+    background-color: gray;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 20px;
+    min-width:250px;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+.saveproblem:hover{
+    border: 2px solid white;
+    background-color: rgb(71, 99, 240);
     transform: scale(1.05);
 }

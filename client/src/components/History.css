@@ -1,0 +1,27 @@
+.ShowHistory {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 5px;
+  width: 100%;
+  max-width: 1800px;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.ShowHistory .item {
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.HistoryTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.HistoryTable th,
+.HistoryTable td {
+  padding: 8px;
+  text-align: center;
+}
