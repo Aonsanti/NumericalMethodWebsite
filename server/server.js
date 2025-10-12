@@ -31,7 +31,7 @@ app.get("/bisection" , (req , res) =>{
             console.error("❌ Bisection Query error:", err.message);
             return res.status(500).json({ error: err.message });
         }
-        console.log("✅ Fetech Bisection:", data.length, "rows");
+        console.log("✅ Fetch Bisection:", data.length, "rows");
         return res.json(data);
     })
 })
@@ -44,6 +44,40 @@ app.get("/falseposition" , (req , res) =>{
             return res.status(500).json({ error: err.message });
         }
         console.log("✅ Fetch False-Position:", data.length, "rows");
+        return res.json(data);
+    })
+})
+
+app.get("/newtonraphson" , (req , res) =>{
+    db.query("SELECT * FROM newtonraphson" , (err , data)=>{
+        if(err){
+            console.error("❌ Newtonraphson Query error:", err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        console.log("✅ Fetch Newtonraphson:", data.length, "rows");
+        return res.json(data);
+    })
+})
+
+
+app.get("/onepoint" , (req , res) =>{
+    db.query("SELECT * FROM onepoint" , (err , data)=>{
+        if(err){
+            console.error("❌ OnePoint Query error:", err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        console.log("✅ Fetch OnePoint:", data.length, "rows");
+        return res.json(data);
+    })
+})
+
+app.get("/secant" , (req , res) =>{
+    db.query("SELECT * FROM secant" , (err , data)=>{
+        if(err){
+            console.error("❌ Secant Query error:", err.message);
+            return res.status(500).json({ error: err.message });
+        }
+        console.log("✅ Fetch Secant:", data.length, "rows");
         return res.json(data);
     })
 })
@@ -99,6 +133,58 @@ app.post('/falseposition' , (req , res) =>{
         }
         console.log("✅ False-Position inserted successfully"); 
         return res.json({ message: "False-Position Insert to Database Success" });
+    })
+})
+
+app.post('/newtonraphson' , (req , res) =>{
+    const sql = "INSERT INTO newtonraphson (`fx` ,`guess`,`tolerance`) VALUES (?)";
+    const values =[
+        req.body.fx,
+        req.body.guess,
+        req.body.tolerance
+    ]
+    db.query(sql,[values] , (err , data) =>{
+        if(err) {
+            console.error("❌ Newtonraphson Insert error:", err.message);
+            return res.status(500).json({ error: err.message }); 
+        }
+        console.log("✅ Newtonraphson inserted successfully"); 
+        return res.json({ message: "Newtonraphson Insert to Database Success" });
+    })
+})
+
+app.post('/onepoint' , (req , res) =>{
+    const sql = "INSERT INTO onepoint (`fx` ,`guess`,`tolerance`) VALUES (?)";
+    const values =[
+        req.body.fx,
+        req.body.guess,
+        req.body.tolerance
+    ]
+    db.query(sql,[values] , (err , data) =>{
+        if(err) {
+            console.error("❌ OnePoint Insert error:", err.message);
+            return res.status(500).json({ error: err.message }); 
+        }
+        console.log("✅ OnePoint inserted successfully"); 
+        return res.json({ message: "OnePoint Insert to Database Success" });
+    })
+})
+
+app.post('/secant' , (req , res) =>{
+    const sql = "INSERT INTO secant (`fx` ,`x0`,`x1`,`tolerance`) VALUES (?)";
+    const values =[
+        req.body.fx,
+        req.body.x0,
+        req.body.x1,
+        req.body.tolerance
+    ]
+    db.query(sql,[values] , (err , data) =>{
+        if(err) {
+            console.error("❌ Secant Insert error:", err.message);
+            return res.status(500).json({ error: err.message }); 
+        }
+        console.log("✅ Secant inserted successfully"); 
+        return res.json({ message: "Secant Insert to Database Success" });
     })
 })
 

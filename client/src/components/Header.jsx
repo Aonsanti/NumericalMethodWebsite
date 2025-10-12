@@ -3,15 +3,18 @@ import { useNavigate } from "react-router-dom";
 import "./Header.css";
 
 const Charpter_Content = {
-  "Root of Equation": ["Bisection", "Graphical", "False Position"],
+  "Root of Equation": ["Graphical", "Bisection", "False Position","NewtonRaphson","OnePoint","Secant"],
   "Linear Algebra": ["Gaussian Elimination", "LU Decomposition", "Matrix Inverse"]
 };
 
 const pathMap = {
   "History": "/history",
-  "Bisection": "/bisection",
   "Graphical": "/graphical",
+  "Bisection": "/bisection",
   "False Position": "/false-position",
+  "NewtonRaphson":"/newtonraphson",
+  "OnePoint":"/onepoint",
+  "Secant":"/secant",
   "Gaussian Elimination": "/gaussian-elimination",
   "LU Decomposition": "/lu-decomposition",
   "Matrix Inverse": "/matrix-inverse",

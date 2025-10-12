@@ -53,31 +53,34 @@ export default function Graphical() {
     let z = null;
     let rootValue = null;
     let result = [];
-
-    for (let x = xStart; x <= xEnd; x += 1) {
-      const f1 = f(x);
-      const f2 = f(x + 1);
-      result.push({
-        x: x.toFixed(4),
-        fx: f1.toFixed(6)
-      });
-      if (f1 * f2 < 0) {
-        y = x;
-        z = x + 1;
-      }
-    }
-
-    if (y !== null && z !== null) {
-      for (let x = y; x <= z; x += 0.000001) {
-        const fval = f(x);
-        if (fval >= 0) {
-          rootValue = x;
-          break;
+    if(xEnd <= 200){
+      for (let x = xStart; x <= xEnd; x += 1) {
+        const f1 = f(x);
+        const f2 = f(x + 1);
+        result.push({
+          x: x.toFixed(4),
+          fx: f1.toFixed(6)
+        });
+        if (f1 * f2 < 0) {
+          y = x;
+          z = x + 1;
         }
       }
+  
+      if (y !== null && z !== null) {
+        for (let x = y; x <= z; x += 0.000001) {
+          const fval = f(x);
+          if (fval >= 0) {
+            rootValue = x;
+            break;
+          }
+        }
+      }
+      setAnswer(result);
+      setRoot(rootValue);
+    }else{
+      alert("Bound in range 200");
     }
-    setAnswer(result);
-    setRoot(rootValue);
   }
 
   return (
@@ -137,7 +140,7 @@ export default function Graphical() {
                 <Line type="monotone" dataKey="fx" stroke="#00bcd4" name="f(x)" dot={false} />
               </LineChart>
             </ResponsiveContainer>
-            <h4 style={{ color: "red" }}> x ≈ {parseFloat(root).toFixed(6)}</h4>
+            <h4 style={{ color: "red"}}> x ≈ {parseFloat(root).toFixed(6)}</h4>
           </div>
         </div>
       )}

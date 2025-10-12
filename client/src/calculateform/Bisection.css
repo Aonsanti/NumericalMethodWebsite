@@ -111,3 +111,11 @@ th:hover , td:hover{
     background-color: rgb(71, 99, 240);
     transform: scale(1.05);
 }
+.nameHeader div{
+    cursor:default;
+    transition: 0.3s;
+}
+.nameHeader div:hover{
+    transform: scale(1.1);
+    color:aquamarine;
+}

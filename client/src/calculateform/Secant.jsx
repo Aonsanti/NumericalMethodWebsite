@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { evaluate } from "mathjs";
+import axios from "axios";
 import {
   LineChart,
   Line,
@@ -8,42 +9,45 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from "recharts";
-import axios from "axios";
-import "./Bisection.css";
 
-export default function Bisection() {
+export default function Secant() {
   const [fx, setFx] = useState("");
-  const [xl, setXl] = useState("");
-  const [xr, setXr] = useState("");
+  const [x0, setX0] = useState("");
+  const [x1, setX1] = useState("");
   const [tolerance, setTolerance] = useState("");
-  const [, setError] = useState("");
   const [answer, setAnswer] = useState([]);
-  const [bisection, setBisection] = useState({
+  const [, setError] = useState("");
+  const [secant, setSecant] = useState({
     fx: "",
-    xl: "",
-    xr: "",
+    x0: "",
+    x1: "",
     tolerance: "",
   });
 
-  function problem(x) {
-    return evaluate(bisection.fx, { x: x });
+  function f(x) {
+    try {
+      return evaluate(secant.fx, { x: x });
+    } catch (e) {
+      console.error("Error evaluating function:", e);
+      return NaN;
+    }
   }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setBisection((prev) => ({ ...prev, [name]: value }));
+    setSecant((prev) => ({ ...prev, [name]: value }));
 
     switch (name) {
       case "fx":
         setFx(value);
         break;
-      case "xl":
-        setXl(value);
+      case "x0":
+        setX0(value);
         break;
-      case "xr":
-        setXr(value);
+      case "x1":
+        setX1(value);
         break;
       case "tolerance":
         setTolerance(value);
@@ -56,50 +60,49 @@ export default function Bisection() {
   const handleClick = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:8080/bisection", bisection);
-      console.log("Save success");
-      alert("Problem already save, Please check in History");
+      await axios.post("http://localhost:8080/secant", secant);
+      alert("Problem already saved, please check in History");
     } catch (err) {
-      console.log(err);
+      console.error(err);
       setError("Failed to save data to database");
     }
   };
 
   function calculate() {
-    let xL = parseFloat(xl);
-    let xR = parseFloat(xr);
-    let tol = parseFloat(tolerance) || 0.0001;
-    let xM = 0;
-    let oldX = 0;
-    let err = 1;
-    let iter = 0;
+    let x0Val = parseFloat(x0);
+    let x1Val = parseFloat(x1);
+    let epsilon = parseFloat(tolerance) || 0.000001;
+    let iteration = 0;
+    let x2 = 0;
     let result = [];
 
-    while (err > tol && iter < 50) {
-      oldX = xM;
-      xM = (xL + xR) / 2.0;
+    while (true) {
+      let f0 = f(x0Val);
+      let f1 = f(x1Val);
 
-      if (problem(xM) * problem(xR) > 0) {
-        xR = xM;
-      } else {
-        xL = xM;
-      }
+      x2 = x1Val - (f1 * (x1Val - x0Val)) / (f1 - f0);
+      iteration++;
 
-      if (iter > 0) {
-        err = Math.abs((xM - oldX) / xM);
-      }
+      let error = Math.abs(x2 - x1Val);
 
       result.push({
-        iteration: iter + 1,
-        xL: xL.toFixed(6),
-        xR: xR.toFixed(6),
-        xM: xM.toFixed(6),
-        error: err.toFixed(6),
+        iteration: iteration,
+        x0: x0Val.toFixed(6),
+        x1: x1Val.toFixed(6),
+        x2: x2.toFixed(6),
+        error: error.toFixed(8),
       });
-      iter++;
+
+      if (error < epsilon || iteration > 50) {
+        break;
+      }
+
+      x0Val = x1Val;
+      x1Val = x2;
     }
-    setError(err);
+
     setAnswer(result);
+    setError(result[result.length - 1] ?.error);
   }
 
   return (
@@ -107,15 +110,15 @@ export default function Bisection() {
       <div className="Formcontainer">
         <div className="nameHeader">
           <div>Function f(x)</div>
-          <div>Lower bound (xL)</div>
-          <div>Upper bound (xR)</div>
+          <div>Initial x0</div>
+          <div>Initial x1</div>
           <div>Tolerance (Error)</div>
         </div>
 
         <div className="data">
           <input placeholder="Function" name="fx" value={fx} onChange={handleChange}/>
-          <input placeholder="Value of XL" name="xl" value={xl} onChange={handleChange}/>
-          <input placeholder="Value of XR" name="xr" value={xr} onChange={handleChange}/>
+          <input placeholder="Value of x0" name="x0" value={x0} onChange={handleChange}/>
+          <input placeholder="Value of x1" name="x1" value={x1} onChange={handleChange}/>
           <input placeholder="Error tolerance" name="tolerance" value={tolerance} onChange={handleChange}/>
         </div>
 
@@ -131,19 +134,19 @@ export default function Bisection() {
             <thead>
               <tr>
                 <th>Iteration</th>
-                <th>xL</th>
-                <th>xR</th>
-                <th>xM</th>
-                <th>Error</th>
+                <th>x0</th>
+                <th>x1</th>
+                <th>x2 (New)</th>
+                <th>Error</th>s
               </tr>
             </thead>
             <tbody>
               {answer.map((row, idx) => (
                 <tr key={idx}>
                   <td>{row.iteration}</td>
-                  <td>{row.xL}</td>
-                  <td>{row.xR}</td>
-                  <td>{row.xM}</td>
+                  <td>{row.x0}</td>
+                  <td>{row.x1}</td>
+                  <td>{row.x2}</td>
                   <td>{row.error}</td>
                 </tr>
               ))}
@@ -153,12 +156,12 @@ export default function Bisection() {
           <div className="graph-container">
             <ResponsiveContainer width="100%" height={400}>
               <LineChart data={answer}>
-                <CartesianGrid strokeDasharray={"0 0"} />
+                <CartesianGrid strokeDasharray="0 0" />
                 <XAxis dataKey="iteration" />
                 <YAxis label={{value: "Value",angle: -90,position: "insideLeft",}}/>
                 <Tooltip contentStyle={{backgroundColor: "#1F2937",border: "1px solid #374151",borderRadius: "8px",color: "#fff",}}/>
                 <Legend />
-                <Line type="monotone" dataKey="xM" stroke="#0000ff" name="xM"/>
+                <Line type="monotone" dataKey="x2" stroke="#0000ff" name="x₂ (Result)"/>
                 <Line type="monotone" dataKey="error" stroke="#ff0000" name="Error"/>
               </LineChart>
             </ResponsiveContainer>
