@@ -4,7 +4,8 @@ import "./Header.css";
 
 const Charpter_Content = {
   "Root of Equation": ["Graphical", "Bisection", "False Position","NewtonRaphson","OnePoint","Secant"],
-  "Linear Algebra": ["Gaussian Elimination", "LU Decomposition", "Matrix Inverse"]
+  "Linear Algebra": ["Cramer's Rule","Matrix Inversion" , "Gaussian Elimination","Gauss Jordan", "LU Decomposition","Choleskey Decomposition" ],
+  "Iteration Linear": ["Jacobi Iteration" , "Gauss Seidal Iteration" , "Conjugate Gradient" ]
 };
 
 const pathMap = {
@@ -15,9 +16,17 @@ const pathMap = {
   "NewtonRaphson":"/newtonraphson",
   "OnePoint":"/onepoint",
   "Secant":"/secant",
+
+  "Cramer's Rule": "/cramer's-rule",
+  "Matrix Inversion": "/matrix-inversion",
   "Gaussian Elimination": "/gaussian-elimination",
+  "Gauss Jordan": "/gauss-jordan",
   "LU Decomposition": "/lu-decomposition",
-  "Matrix Inverse": "/matrix-inverse",
+  "Choleskey Decomposition": "/choleskey-decomposition",
+
+  "Jacobi Iteration" : "/jacobi-iteration",
+  "Gauss Seidal Iteration" : "/gauss-seidal-iteration",
+  "Conjugate Gradient" : "/conjugate-gradient"
 };
 
 export default function Header() {

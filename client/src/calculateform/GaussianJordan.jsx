@@ -2,111 +2,98 @@ import { useState } from "react";
 import axios from "axios";
 import "./GaussianElimination.css";
 
-export default function LUDecompositionCrout() {
+export default function GaussJordan() {
   const [size, setSize] = useState(3);
   const [matrixA, setMatrixA] = useState(
     Array(3).fill().map(() => Array(3).fill(""))
   );
   const [matrixB, setMatrixB] = useState(Array(3).fill(""));
-  const [L, setL] = useState([]);
-  const [U, setU] = useState([]);
   const [result, setResult] = useState([]);
+  const [finalMatrix, setFinalMatrix] = useState([]); 
   const [error, setError] = useState("");
 
-  // ✅ เปลี่ยนค่า Matrix A
   const handleMatrixAChange = (row, col, value) => {
     const newMatrix = [...matrixA];
     newMatrix[row][col] = value;
     setMatrixA(newMatrix);
   };
 
-  // ✅ เปลี่ยนค่า Matrix B
   const handleMatrixBChange = (row, value) => {
     const newMatrix = [...matrixB];
     newMatrix[row] = value;
     setMatrixB(newMatrix);
   };
 
-  // ✅ เปลี่ยนขนาด Matrix
   const handleSizeChange = (e) => {
     const newSize = parseInt(e.target.value);
     setSize(newSize);
     setMatrixA(Array(newSize).fill().map(() => Array(newSize).fill("")));
     setMatrixB(Array(newSize).fill(""));
-    setL([]);
-    setU([]);
     setResult([]);
+    setFinalMatrix([]);
     setError("");
   };
 
-  // ✅ คำนวณ LU (Crout's Method)
-  const calculateLU = () => {
+  // ✅ Gauss–Jordan Elimination
+  const calculateGaussJordan = () => {
     try {
+      const A = matrixA.map((row) => row.map((val) => parseFloat(val)));
+      const B = matrixB.map((val) => [parseFloat(val)]);
       const n = size;
-      const A = matrixA.map(row => row.map(val => parseFloat(val)));
-      const B = matrixB.map(val => parseFloat(val));
+      const augmented = A.map((row, i) => [...row, B[i][0]]);
 
-      const L = Array(n).fill().map(() => Array(n).fill(0));
-      const U = Array(n).fill().map(() => Array(n).fill(0));
-
-      // --- Crout Method ---
+      // ทำให้เป็น Reduced Row Echelon Form
       for (let i = 0; i < n; i++) {
-        U[i][i] = 1; // diagonal ของ U = 1
+        // หาค่า pivot
+        let maxRow = i;
+        for (let k = i + 1; k < n; k++) {
+          if (Math.abs(augmented[k][i]) > Math.abs(augmented[maxRow][i])) {
+            maxRow = k;
+          }
+        }
+        [augmented[i], augmented[maxRow]] = [augmented[maxRow], augmented[i]];
 
-        // คำนวณ L
-        for (let j = i; j < n; j++) {
-          let sum = 0;
-          for (let k = 0; k < i; k++) sum += L[j][k] * U[k][i];
-          L[j][i] = A[j][i] - sum;
+        const pivot = augmented[i][i];
+        if (pivot === 0 || isNaN(pivot)) throw new Error("Singular matrix");
+
+        // ทำให้ pivot = 1
+        for (let j = 0; j <= n; j++) {
+          augmented[i][j] /= pivot;
         }
 
-        // คำนวณ U
-        for (let j = i + 1; j < n; j++) {
-          let sum = 0;
-          for (let k = 0; k < i; k++) sum += L[i][k] * U[k][j];
-          if (L[i][i] === 0) throw new Error("Singular matrix (L[i][i] = 0)");
-          U[i][j] = (A[i][j] - sum) / L[i][i];
+        // ทำให้คอลัมน์อื่นๆ ในคอลัมน์ pivot เป็น 0
+        for (let k = 0; k < n; k++) {
+          if (k !== i) {
+            const factor = augmented[k][i];
+            for (let j = 0; j <= n; j++) {
+              augmented[k][j] -= factor * augmented[i][j];
+            }
+          }
         }
       }
 
-      // --- Forward Substitution (Ly = B)
-      const y = Array(n).fill(0);
-      for (let i = 0; i < n; i++) {
-        let sum = 0;
-        for (let j = 0; j < i; j++) sum += L[i][j] * y[j];
-        y[i] = (B[i] - sum) / L[i][i];
-      }
+      // ✅ คำตอบคือค่าในคอลัมน์สุดท้าย
+      const x = augmented.map((row) => row[n]);
 
-      // --- Backward Substitution (Ux = y)
-      const x = Array(n).fill(0);
-      for (let i = n - 1; i >= 0; i--) {
-        let sum = 0;
-        for (let j = i + 1; j < n; j++) sum += U[i][j] * x[j];
-        x[i] = y[i] - sum;
-      }
-
-      setL(L);
-      setU(U);
       setResult(x);
+      setFinalMatrix(augmented);
       setError("");
     } catch (err) {
       console.error(err);
       setError("Invalid or singular matrix input!");
-      setL([]);
-      setU([]);
       setResult([]);
+      setFinalMatrix([]);
     }
   };
 
-  // ✅ Save to DB
   const handleSave = async () => {
     try {
-      await axios.post("http://localhost:8080/lucrout", {
+      await axios.post("http://localhost:8080/gaussjordan", {
         size,
         matrixA,
         matrixB,
       });
-      alert("LU (Crout) problem saved successfully!");
+      alert("Gauss–Jordan problem saved successfully!");
     } catch (err) {
       console.error(err);
       setError("Failed to save data to database.");
@@ -127,7 +114,7 @@ export default function LUDecompositionCrout() {
       </div>
 
       <div className="matrix-section">
-        {/* ✅ Matrix A */}
+        {/* Matrix A */}
         <div className="matrix-input">
           <h3>Matrix A</h3>
           {matrixA.map((row, rowIndex) => (
@@ -147,7 +134,7 @@ export default function LUDecompositionCrout() {
           ))}
         </div>
 
-        {/* ✅ Matrix B */}
+        {/* Matrix B */}
         <div className="matrix-b">
           <h3>Matrix B</h3>
           {matrixB.map((val, rowIndex) => (
@@ -163,7 +150,7 @@ export default function LUDecompositionCrout() {
       </div>
 
       <div className="buttons">
-        <button onClick={calculateLU} className="confirm">
+        <button onClick={calculateGaussJordan} className="confirm">
           Calculate
         </button>
         <button onClick={handleSave} className="saveproblem">
@@ -174,36 +161,30 @@ export default function LUDecompositionCrout() {
       {error && <div className="error">{error}</div>}
 
       {result.length > 0 && (
-        <div className="result">
-          <h3>Solution:</h3>
-          {result.map((val, i) => (
-            <p key={i}>x{i + 1} = {val.toFixed(6)}</p>
-          ))}
-
-          <h3>Matrix L:</h3>
-          <div className="final-matrix">
-            {L.map((row, i) => (
-              <div key={i} className="matrix-row">
-                {row.map((val, j) => (
-                  <span key={j} className="matrix-cell readonly">
-                    {val.toFixed(3)}
-                  </span>
-                ))}
-              </div>
+        <div className="result-section">
+          {/* แสดงผลลัพธ์และ matrix ข้างกัน */}
+          <div className="result-box">
+            <h3>Solution</h3>
+            {result.map((val, i) => (
+              <p key={i}>
+                x{i + 1} = {val.toFixed(6)}
+              </p>
             ))}
           </div>
 
-          <h3>Matrix U:</h3>
-          <div className="final-matrix">
-            {U.map((row, i) => (
-              <div key={i} className="matrix-row">
-                {row.map((val, j) => (
-                  <span key={j} className="matrix-cell readonly">
-                    {val.toFixed(3)}
-                  </span>
-                ))}
-              </div>
-            ))}
+          <div className="final-matrix-box">
+            <h3>Final Reduced Matrix</h3>
+            <div className="final-matrix">
+              {finalMatrix.map((row, i) => (
+                <div key={i} className="matrix-row">
+                  {row.map((val, j) => (
+                    <span key={j} className="matrix-cell readonly">
+                      {val.toFixed(3)}
+                    </span>
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}

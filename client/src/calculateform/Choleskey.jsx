@@ -1,112 +1,131 @@
 import { useState } from "react";
 import axios from "axios";
-import "./GaussianElimination.css";
 
-export default function LUDecompositionCrout() {
+export default function CholeskyDecomposition() {
   const [size, setSize] = useState(3);
   const [matrixA, setMatrixA] = useState(
     Array(3).fill().map(() => Array(3).fill(""))
   );
   const [matrixB, setMatrixB] = useState(Array(3).fill(""));
-  const [L, setL] = useState([]);
-  const [U, setU] = useState([]);
+  const [LMatrix, setLMatrix] = useState([]);
+  const [LTMatrix, setLTMatrix] = useState([]);
   const [result, setResult] = useState([]);
   const [error, setError] = useState("");
 
-  // ✅ เปลี่ยนค่า Matrix A
+  // เปลี่ยนค่าช่อง input matrix A
   const handleMatrixAChange = (row, col, value) => {
     const newMatrix = [...matrixA];
     newMatrix[row][col] = value;
     setMatrixA(newMatrix);
   };
 
-  // ✅ เปลี่ยนค่า Matrix B
+  // เปลี่ยนค่าช่อง input matrix B
   const handleMatrixBChange = (row, value) => {
     const newMatrix = [...matrixB];
     newMatrix[row] = value;
     setMatrixB(newMatrix);
   };
 
-  // ✅ เปลี่ยนขนาด Matrix
+  // เปลี่ยนขนาดเมทริกซ์
   const handleSizeChange = (e) => {
     const newSize = parseInt(e.target.value);
     setSize(newSize);
     setMatrixA(Array(newSize).fill().map(() => Array(newSize).fill("")));
     setMatrixB(Array(newSize).fill(""));
-    setL([]);
-    setU([]);
     setResult([]);
+    setLMatrix([]);
+    setLTMatrix([]);
     setError("");
   };
 
-  // ✅ คำนวณ LU (Crout's Method)
-  const calculateLU = () => {
+  // ✅ คำนวณ Cholesky Decomposition
+  const calculateCholesky = () => {
     try {
       const n = size;
-      const A = matrixA.map(row => row.map(val => parseFloat(val)));
-      const B = matrixB.map(val => parseFloat(val));
+      const A = matrixA.map((row) => row.map((val) => parseFloat(val)));
+      const B = matrixB.map((val) => parseFloat(val));
 
-      const L = Array(n).fill().map(() => Array(n).fill(0));
-      const U = Array(n).fill().map(() => Array(n).fill(0));
-
-      // --- Crout Method ---
+      // ตรวจสอบว่าเป็น symmetric หรือไม่
       for (let i = 0; i < n; i++) {
-        U[i][i] = 1; // diagonal ของ U = 1
-
-        // คำนวณ L
-        for (let j = i; j < n; j++) {
-          let sum = 0;
-          for (let k = 0; k < i; k++) sum += L[j][k] * U[k][i];
-          L[j][i] = A[j][i] - sum;
-        }
-
-        // คำนวณ U
-        for (let j = i + 1; j < n; j++) {
-          let sum = 0;
-          for (let k = 0; k < i; k++) sum += L[i][k] * U[k][j];
-          if (L[i][i] === 0) throw new Error("Singular matrix (L[i][i] = 0)");
-          U[i][j] = (A[i][j] - sum) / L[i][i];
+        for (let j = 0; j < n; j++) {
+          if (A[i][j] !== A[j][i]) {
+            throw new Error("Matrix A must be symmetric!");
+          }
         }
       }
 
-      // --- Forward Substitution (Ly = B)
+      // สร้าง L matrix ว่าง
+      const L = Array(n).fill().map(() => Array(n).fill(0));
+
+      // คำนวณค่า L ตามสูตร Cholesky
+      for (let i = 0; i < n; i++) {
+        for (let j = 0; j <= i; j++) {
+          let sum = 0;
+          for (let k = 0; k < j; k++) {
+            sum += L[i][k] * L[j][k];
+          }
+
+          if (i === j) {
+            const diag = A[i][i] - sum;
+            if (diag <= 0) throw new Error("Matrix is not positive definite!");
+            L[i][j] = Math.sqrt(diag);
+          } else {
+            L[i][j] = (A[i][j] - sum) / L[j][j];
+          }
+        }
+      }
+
+      // หา Lᵀ
+      const LT = Array(n)
+        .fill()
+        .map(() => Array(n).fill(0));
+      for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+          LT[i][j] = L[j][i];
+        }
+      }
+
+      // Forward substitution: L * y = B
       const y = Array(n).fill(0);
       for (let i = 0; i < n; i++) {
         let sum = 0;
-        for (let j = 0; j < i; j++) sum += L[i][j] * y[j];
+        for (let j = 0; j < i; j++) {
+          sum += L[i][j] * y[j];
+        }
         y[i] = (B[i] - sum) / L[i][i];
       }
 
-      // --- Backward Substitution (Ux = y)
+      // Backward substitution: Lᵀ * x = y
       const x = Array(n).fill(0);
       for (let i = n - 1; i >= 0; i--) {
         let sum = 0;
-        for (let j = i + 1; j < n; j++) sum += U[i][j] * x[j];
-        x[i] = y[i] - sum;
+        for (let j = i + 1; j < n; j++) {
+          sum += LT[i][j] * x[j];
+        }
+        x[i] = (y[i] - sum) / LT[i][i];
       }
 
-      setL(L);
-      setU(U);
+      setLMatrix(L);
+      setLTMatrix(LT);
       setResult(x);
       setError("");
     } catch (err) {
       console.error(err);
-      setError("Invalid or singular matrix input!");
-      setL([]);
-      setU([]);
+      setError(err.message || "Error occurred during Cholesky decomposition!");
       setResult([]);
+      setLMatrix([]);
+      setLTMatrix([]);
     }
   };
 
-  // ✅ Save to DB
   const handleSave = async () => {
     try {
-      await axios.post("http://localhost:8080/lucrout", {
+      await axios.post("http://localhost:8080/cholesky", {
         size,
         matrixA,
         matrixB,
       });
-      alert("LU (Crout) problem saved successfully!");
+      alert("Cholesky problem saved successfully!");
     } catch (err) {
       console.error(err);
       setError("Failed to save data to database.");
@@ -127,7 +146,7 @@ export default function LUDecompositionCrout() {
       </div>
 
       <div className="matrix-section">
-        {/* ✅ Matrix A */}
+        {/* Matrix A */}
         <div className="matrix-input">
           <h3>Matrix A</h3>
           {matrixA.map((row, rowIndex) => (
@@ -147,7 +166,7 @@ export default function LUDecompositionCrout() {
           ))}
         </div>
 
-        {/* ✅ Matrix B */}
+        {/* Matrix B */}
         <div className="matrix-b">
           <h3>Matrix B</h3>
           {matrixB.map((val, rowIndex) => (
@@ -163,7 +182,7 @@ export default function LUDecompositionCrout() {
       </div>
 
       <div className="buttons">
-        <button onClick={calculateLU} className="confirm">
+        <button onClick={calculateCholesky} className="confirm">
           Calculate
         </button>
         <button onClick={handleSave} className="saveproblem">
@@ -177,12 +196,15 @@ export default function LUDecompositionCrout() {
         <div className="result">
           <h3>Solution:</h3>
           {result.map((val, i) => (
-            <p key={i}>x{i + 1} = {val.toFixed(6)}</p>
+            <p key={i}>
+              x{i + 1} = {val.toFixed(6)}
+            </p>
           ))}
 
+          {/* ✅ แสดง L Matrix */}
           <h3>Matrix L:</h3>
           <div className="final-matrix">
-            {L.map((row, i) => (
+            {LMatrix.map((row, i) => (
               <div key={i} className="matrix-row">
                 {row.map((val, j) => (
                   <span key={j} className="matrix-cell readonly">
@@ -193,9 +215,10 @@ export default function LUDecompositionCrout() {
             ))}
           </div>
 
-          <h3>Matrix U:</h3>
+          {/* ✅ แสดง Lᵀ Matrix */}
+          <h3>Matrix Lᵀ:</h3>
           <div className="final-matrix">
-            {U.map((row, i) => (
+            {LTMatrix.map((row, i) => (
               <div key={i} className="matrix-row">
                 {row.map((val, j) => (
                   <span key={j} className="matrix-cell readonly">

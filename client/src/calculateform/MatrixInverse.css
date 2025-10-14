@@ -1,0 +1,75 @@
+.matrix-container {
+  margin: 20px;
+  text-align: center;
+  color: #f3f4f6;
+  
+}
+
+.controls {
+  margin-bottom: 15px;
+}
+
+.matrix-input {
+  display: inline-block;
+  margin-bottom: 20px;
+}
+
+.matrix-row {
+  display: flex;
+  justify-content: center;
+  
+}
+
+.matrix-cell {
+  width: 60px;
+  height: 50px;
+  text-align: center;
+  margin: 3px;
+  border: 1px solid #555;
+  border-radius: 6px;
+  background-color: #1f2937;
+  color: #fff;
+}
+
+.matrix-cell .result-cell {
+    border: 10px solid red;
+}
+
+.buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+button.confirm,
+button.saveproblem {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+button.confirm:hover,
+button.saveproblem:hover {
+  background-color: #1e40af;
+}
+
+.error {
+  color: #ef4444;
+  margin-bottom: 10px;
+}
+
+.result table {
+  margin: 0 auto;
+  border-collapse: collapse;
+}
+
+.result td {
+  border: 1px solid #9ca3af;
+  padding: 6px 10px;
+  text-align: center;
+}

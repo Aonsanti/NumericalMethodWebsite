@@ -1,15 +1,12 @@
 import { useState } from "react";
 import axios from "axios";
-import "./GaussianElimination.css";
 
-export default function LUDecompositionCrout() {
+export default function CramerRule() {
   const [size, setSize] = useState(3);
   const [matrixA, setMatrixA] = useState(
     Array(3).fill().map(() => Array(3).fill(""))
   );
   const [matrixB, setMatrixB] = useState(Array(3).fill(""));
-  const [L, setL] = useState([]);
-  const [U, setU] = useState([]);
   const [result, setResult] = useState([]);
   const [error, setError] = useState("");
 
@@ -33,67 +30,57 @@ export default function LUDecompositionCrout() {
     setSize(newSize);
     setMatrixA(Array(newSize).fill().map(() => Array(newSize).fill("")));
     setMatrixB(Array(newSize).fill(""));
-    setL([]);
-    setU([]);
     setResult([]);
     setError("");
   };
 
-  // ✅ คำนวณ LU (Crout's Method)
-  const calculateLU = () => {
+  // ✅ ฟังก์ชันหาค่า determinant แบบ recursive
+  const determinant = (matrix) => {
+    const n = matrix.length;
+    if (n === 1) return matrix[0][0];
+    if (n === 2)
+      return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+
+    let det = 0;
+    for (let col = 0; col < n; col++) {
+      const subMatrix = matrix
+        .slice(1)
+        .map(row => row.filter((_, j) => j !== col));
+      det += ((col % 2 === 0 ? 1 : -1) * matrix[0][col] * determinant(subMatrix));
+    }
+    return det;
+  };
+
+  // ✅ คำนวณด้วย Cramer's Rule
+  const calculateCramer = () => {
     try {
       const n = size;
       const A = matrixA.map(row => row.map(val => parseFloat(val)));
       const B = matrixB.map(val => parseFloat(val));
 
-      const L = Array(n).fill().map(() => Array(n).fill(0));
-      const U = Array(n).fill().map(() => Array(n).fill(0));
+      // ตรวจสอบ input
+      if (A.some(row => row.some(isNaN)) || B.some(isNaN)) {
+        throw new Error("Invalid matrix input");
+      }
 
-      // --- Crout Method ---
+      const detA = determinant(A);
+      if (detA === 0) throw new Error("Det(A) = 0, no unique solution");
+
+      const results = [];
       for (let i = 0; i < n; i++) {
-        U[i][i] = 1; // diagonal ของ U = 1
-
-        // คำนวณ L
-        for (let j = i; j < n; j++) {
-          let sum = 0;
-          for (let k = 0; k < i; k++) sum += L[j][k] * U[k][i];
-          L[j][i] = A[j][i] - sum;
-        }
-
-        // คำนวณ U
-        for (let j = i + 1; j < n; j++) {
-          let sum = 0;
-          for (let k = 0; k < i; k++) sum += L[i][k] * U[k][j];
-          if (L[i][i] === 0) throw new Error("Singular matrix (L[i][i] = 0)");
-          U[i][j] = (A[i][j] - sum) / L[i][i];
-        }
+        // สร้าง A_i
+        const Ai = A.map((row, r) =>
+          row.map((val, c) => (c === i ? B[r] : val))
+        );
+        const detAi = determinant(Ai);
+        results.push(detAi / detA);
       }
 
-      // --- Forward Substitution (Ly = B)
-      const y = Array(n).fill(0);
-      for (let i = 0; i < n; i++) {
-        let sum = 0;
-        for (let j = 0; j < i; j++) sum += L[i][j] * y[j];
-        y[i] = (B[i] - sum) / L[i][i];
-      }
-
-      // --- Backward Substitution (Ux = y)
-      const x = Array(n).fill(0);
-      for (let i = n - 1; i >= 0; i--) {
-        let sum = 0;
-        for (let j = i + 1; j < n; j++) sum += U[i][j] * x[j];
-        x[i] = y[i] - sum;
-      }
-
-      setL(L);
-      setU(U);
-      setResult(x);
+      setResult(results);
       setError("");
     } catch (err) {
       console.error(err);
       setError("Invalid or singular matrix input!");
-      setL([]);
-      setU([]);
       setResult([]);
     }
   };
@@ -101,12 +88,12 @@ export default function LUDecompositionCrout() {
   // ✅ Save to DB
   const handleSave = async () => {
     try {
-      await axios.post("http://localhost:8080/lucrout", {
+      await axios.post("http://localhost:8080/cramer", {
         size,
         matrixA,
         matrixB,
       });
-      alert("LU (Crout) problem saved successfully!");
+      alert("Cramer's Rule problem saved successfully!");
     } catch (err) {
       console.error(err);
       setError("Failed to save data to database.");
@@ -163,7 +150,7 @@ export default function LUDecompositionCrout() {
       </div>
 
       <div className="buttons">
-        <button onClick={calculateLU} className="confirm">
+        <button onClick={calculateCramer} className="confirm">
           Calculate
         </button>
         <button onClick={handleSave} className="saveproblem">
@@ -179,32 +166,6 @@ export default function LUDecompositionCrout() {
           {result.map((val, i) => (
             <p key={i}>x{i + 1} = {val.toFixed(6)}</p>
           ))}
-
-          <h3>Matrix L:</h3>
-          <div className="final-matrix">
-            {L.map((row, i) => (
-              <div key={i} className="matrix-row">
-                {row.map((val, j) => (
-                  <span key={j} className="matrix-cell readonly">
-                    {val.toFixed(3)}
-                  </span>
-                ))}
-              </div>
-            ))}
-          </div>
-
-          <h3>Matrix U:</h3>
-          <div className="final-matrix">
-            {U.map((row, i) => (
-              <div key={i} className="matrix-row">
-                {row.map((val, j) => (
-                  <span key={j} className="matrix-cell readonly">
-                    {val.toFixed(3)}
-                  </span>
-                ))}
-              </div>
-            ))}
-          </div>
         </div>
       )}
     </div>

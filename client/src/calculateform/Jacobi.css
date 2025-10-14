@@ -1,0 +1,77 @@
+/* ========================= */
+/* ✅ Jacobi Iteration Layout */
+/* ========================= */
+
+/* ส่วนหลัก A | X Values | B */
+.matrix-section {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 50px;
+  margin: 20px 0;
+}
+
+/* กล่องย่อย (Matrix A, X Values, Matrix B) */
+.matrix-input,
+.matrix-b,
+.x-values {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.matrix-input h3,
+.x-values h3,
+.matrix-b h3 {
+  margin-bottom: 10px;
+  color: #f9fafb;
+}
+
+/* ช่องเมทริกซ์ */
+.matrix-row {
+  display: flex;
+  justify-content: center;
+}
+
+.matrix-cell {
+  width: 120px;
+  height: 50px;
+  margin: 3px;
+  text-align: center;
+  border: 1px solid #555;
+  border-radius: 6px;
+  background-color: #1f2937;
+  color: #fff;
+  font-size: 16px;
+}
+
+/* ช่อง X Values (disabled) */
+.matrix-cell.readonly:disabled {
+  background-color: #374151;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* ส่วน Tolerance อยู่ล่างสุดตรงกลาง */
+.extra-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 15px;
+}
+
+.extra-section h3 {
+  margin-right: 10px;
+  color: #f9fafb;
+}
+
+.extra-section input {
+  width: 120px;
+  height: 45px;
+  text-align: center;
+  border: 1px solid #555;
+  border-radius: 6px;
+  background-color: #1f2937;
+  color: #fff;
+  font-size: 16px;
+}

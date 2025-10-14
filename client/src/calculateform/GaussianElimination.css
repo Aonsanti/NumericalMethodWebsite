@@ -1,0 +1,25 @@
+.matrix-section {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 50px; 
+  margin: 20px 0;
+}
+
+.matrix-input,
+.matrix-b {
+  display: flex;
+  flex-direction: column;
+}
+
+.matrix-row {
+  display: flex;
+}
+
+.matrix-cell {
+  width: 120px;
+  height: 50px;
+  margin: 3px;
+  text-align: center;
+  font-size: 16px;
+}
