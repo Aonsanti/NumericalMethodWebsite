@@ -4,8 +4,11 @@ import "./Header.css";
 
 const Charpter_Content = {
   "Root of Equation": ["Graphical", "Bisection", "False Position","NewtonRaphson","OnePoint","Secant"],
-  "Linear Algebra": ["Cramer's Rule","Matrix Inversion" , "Gaussian Elimination","Gauss Jordan", "LU Decomposition","Choleskey Decomposition" ],
-  "Iteration Linear": ["Jacobi Iteration" , "Gauss Seidal Iteration" , "Conjugate Gradient" ]
+  "Linear Algebra": ["Cramer's Rule","Matrix Inversion" , "Gaussian Elimination","Gauss Jordan", "LU Decomposition","Choleskey Decomposition","Jacobi Iteration" , "Gauss Seidal Iteration" , "Conjugate Gradient" ],
+  "Interpolation":["Newton's Divied Difference","Lagrange Polynomials","Spline Interpolation"],
+  "Extrapolation":["Simple Regression","Multiple Regression"],
+  "Integration":["Trapezoidal","Simpson","Composite Trapezoidal","Composite Simpson"]
+  ,"Differentiation":["Differentiation"]
 };
 
 const pathMap = {
@@ -23,10 +26,24 @@ const pathMap = {
   "Gauss Jordan": "/gauss-jordan",
   "LU Decomposition": "/lu-decomposition",
   "Choleskey Decomposition": "/choleskey-decomposition",
-
   "Jacobi Iteration" : "/jacobi-iteration",
   "Gauss Seidal Iteration" : "/gauss-seidal-iteration",
-  "Conjugate Gradient" : "/conjugate-gradient"
+  "Conjugate Gradient" : "/conjugate-gradient",
+
+  "Newton's Divied Difference":"/newton-divied-difference",
+  "Lagrange Polynomials":"/lagrange-polynomials",
+  "Spline Interpolation":"/spline-interpolation",
+
+  "Simple Regression":"/simple-regression",
+  "Multiple Regression":"/multiple-regression",
+
+  "Trapezoidal":"/trapezoidal",
+  "Simpson":"/simpson",
+  "Composite Trapezoidal":"/composite-trapezoidal",
+  "Composite Simpson":"/composite-simpson", 
+  
+  "Differentiation":"/differentiation",
+
 };
 
 export default function Header() {

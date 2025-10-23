@@ -1,0 +1,180 @@
+/* =========================
+   Simple Regression styles
+   (compatible with jacobi.css look)
+   ========================= */
+
+/* Container */
+.regression-container {
+  max-width: 980px;
+  margin: 18px auto;
+  padding: 18px;
+  border-radius: 12px;
+  background-color: #0f1724; /* darker panel */
+  box-shadow: 0 6px 20px rgba(2,6,23,0.6);
+  color: #f9fafb;
+  font-family: Inter, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Header */
+.regression-container h2 {
+  margin: 0 0 14px 0;
+  font-size: 20px;
+  color: #f9fafb;
+  text-align: left;
+}
+
+/* Input table */
+.input-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+}
+.input-table thead th {
+  text-align: left;
+  padding: 10px 8px;
+  font-size: 14px;
+  color: #e6eef8;
+  border-bottom: 1px solid #273449;
+}
+.input-table tbody td {
+  padding: 6px 8px;
+  vertical-align: middle;
+  border-bottom: 1px dashed rgba(255,255,255,0.03);
+}
+
+/* Inputs inside table */
+.input-table input {
+  width: 120px;
+  height: 44px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #374151;
+  background-color: #1f2937;
+  color: #fff;
+  font-size: 15px;
+  text-align: center;
+  outline: none;
+  transition: box-shadow 0.12s ease, transform 0.06s ease;
+}
+.input-table input:focus {
+  box-shadow: 0 4px 14px rgba(59,130,246,0.12);
+  transform: translateY(-1px);
+  border-color: rgba(59,130,246,0.6);
+}
+
+/* Add / control buttons row */
+.buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 10px 0 14px 0;
+}
+
+/* Generic button style */
+.add-btn,
+.confirm,
+.saveproblem,
+.delete-btn {
+  background-color: #111827;
+  color: #f9fafb;
+  border: 1px solid #374151;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.08s ease, background-color 0.12s ease;
+  box-shadow: 0 6px 16px rgba(2,6,23,0.45);
+}
+.add-btn:hover,
+.confirm:hover,
+.saveproblem:hover,
+.delete-btn:hover {
+  transform: translateY(-2px);
+  background-color: #0b1220;
+}
+
+/* Emphasize primary confirm */
+.confirm {
+  background: linear-gradient(180deg,#2563eb,#1e40af);
+  border: 1px solid rgba(0,0,0,0.25);
+  box-shadow: 0 8px 24px rgba(37,99,235,0.18);
+}
+.saveproblem {
+  background: linear-gradient(180deg,#10b981,#059669);
+  border: 1px solid rgba(0,0,0,0.18);
+  box-shadow: 0 8px 22px rgba(16,185,129,0.12);
+}
+
+/* Delete small button */
+.delete-btn {
+  padding: 6px 8px;
+  min-width: 36px;
+  border-radius: 8px;
+  background-color: transparent;
+  border: 1px solid rgba(255,255,255,0.04);
+  color: #f87171;
+}
+
+/* Predict section */
+.predict-section {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 12px 0;
+  flex-wrap: wrap;
+}
+.predict-section h3 {
+  margin: 0;
+  font-size: 14px;
+  color: #e6eef8;
+}
+.predict-section input {
+  width: 140px;
+  height: 44px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #374151;
+  background-color: #1f2937;
+  color: #fff;
+  font-size: 15px;
+  text-align: center;
+}
+
+/* Result area */
+.result-section {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid rgba(255,255,255,0.03);
+}
+.result-section h3 {
+  margin: 0 0 8px 0;
+  color: #f9fafb;
+}
+.result-section p {
+  margin: 6px 0;
+  color: #d1e7ff;
+  font-size: 15px;
+}
+
+/* Graph container */
+.graph-container {
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: 10px;
+  background-color: #071028;
+  border: 1px solid rgba(255,255,255,0.03);
+  min-height: 260px;
+}
+
+/* Error message */
+.error {
+  margin-top: 8px;
+  color: #fecaca;
+  background-color: rgba(254,202,202,0.06);
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(254,202,202,0.06);
+}
+

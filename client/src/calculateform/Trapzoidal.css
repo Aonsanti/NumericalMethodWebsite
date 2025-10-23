@@ -1,0 +1,95 @@
+.trap-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #f9fafb;
+  padding: 20px;
+}
+
+h2 {
+  margin-bottom: 20px;
+  color: #60a5fa;
+}
+
+.trap-input-section {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.input-group label {
+  margin-bottom: 5px;
+  color: #f9fafb;
+}
+
+.input-group input {
+  width: 220px;
+  height: 45px;
+  padding: 5px 10px;
+  text-align: left;
+  border: 1px solid #555;
+  border-radius: 6px;
+  background-color: #1f2937;
+  color: #fff;
+  font-size: 16px;
+}
+
+.trap-buttons {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.confirm,
+.saveproblem {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.confirm {
+  background-color: #2563eb;
+  color: white;
+}
+
+.confirm:hover {
+  background-color: #1d4ed8;
+}
+
+.saveproblem {
+  background-color: #10b981;
+  color: white;
+}
+
+.saveproblem:hover {
+  background-color: #059669;
+}
+
+.error {
+  color: #f87171;
+  margin-top: 10px;
+}
+
+.trap-result {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 18px;
+  color: #e5e7eb;
+}
+
+.trap-graph {
+  width: 90%;
+  margin-top: 20px;
+}
